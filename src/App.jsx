@@ -84,11 +84,7 @@ function App() {
           >
             Synonyms {synonyms ? "Enabled" : "Disabled"}
           </label>
-          <Switch
-            checked={synonyms}
-            onChange={handleChange}
-            inputProps={{ "aria-label": "controlled" }}
-          />
+          <Switch checked={synonyms} onChange={handleChange} />
         </Box>
 
         <Box sx={{ width: 120 }}>
@@ -106,6 +102,8 @@ function App() {
       </div>
       <div id="keywords-div" className="row">
         <Textarea
+          minRows={1}
+          maxRows={2}
           placeholder="Type your keywords here..."
           value={text}
           onChange={(event) => {
@@ -126,8 +124,6 @@ function App() {
               setText("");
             } else setText(inputValue);
           }}
-          minRows={2}
-          maxRows={4}
           endDecorator={
             <JoyBox sx={{ display: "flex-inline", gap: 0.5 }}>
               {keywords.map((keyword) => (
@@ -162,7 +158,7 @@ function App() {
           sx={{ minWidth: 300 }}
         />
       </div>
-      <div id="search-&-Navigate" className="row flex">
+      <div id="search-&-Navigate" className="row flex flex-edges">
         <div id="search">
           <Button variant="outlined">
             <MdOutlineSearch
@@ -173,14 +169,24 @@ function App() {
           </Button>
         </div>
         <div id="navigate" className="flex">
-          <Button className="nav-button" variant="outlined">
+          <Button
+            className="nav-button"
+            id="find-prev"
+            variant="outlined"
+            style={{ borderRadius: "10px 0 0 10px" }}
+          >
             <MdKeyboardArrowLeft
               size={"1.4rem"}
               style={{ marginRight: "4px", marginTop: "2px" }}
             />
             Back
           </Button>
-          <Button className="nav-button" variant="outlined">
+          <Button
+            id="find-next"
+            className="nav-button"
+            variant="outlined"
+            style={{ borderRadius: "0 10px 10px 0" }}
+          >
             Next
             <MdKeyboardArrowRight
               size={"1.4rem"}

@@ -1,3 +1,9 @@
+#react-target {
+  width: 320px;
+}
+.row {
+  margin: 8px 0;
+}
 .loginLabel {
   display: flex;
   flex-direction: column;
@@ -77,6 +83,9 @@ form input {
 .flex {
   display: flex;
   justify-content: space-around;
+}
+.flex-edges {
+  justify-content: space-between;
 }
 
 .secondary-btn {
