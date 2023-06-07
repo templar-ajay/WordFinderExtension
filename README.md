@@ -1,2 +1,2 @@
-# react-chrome-extension
-an initial setup using of a chrome extension (written in react) using webpack
+# Word Finder Extension
+written in react - used to find saved keywords in every webpage and pdf file on browser
