@@ -1,8 +1,15 @@
-.foundLELELEL {
+/* .foundLELELEL {
   background-color: #ffff80;
   color: black;
 }
 
 .curLELELEL {
+  background-color: orange;
+} */
+._highlighted {
+  background-color: yellow;
+  color: black;
+}
+._current-highlighted {
   background-color: orange;
 }

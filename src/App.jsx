@@ -10,6 +10,8 @@ import { MdDeleteForever } from "react-icons/md";
 import { MdOutlineSearch } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import { AiOutlineClear } from "react-icons/ai";
+//
 
 const levels = [
   {
@@ -63,6 +65,28 @@ function App() {
     if (!keywords.find((x) => x.id === keyword?.id)) {
       setKeywords([...keywords, keyword]);
     }
+  }
+
+  function handleSearch() {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+      const clearRes = await chrome.tabs.sendMessage(tabs[0].id, {
+        ram: "ram",
+        clearSearch: true,
+      });
+      const searchRes = await chrome.tabs.sendMessage(tabs[0].id, {
+        ram: "ram",
+        search: keywords.map((x) => x.keyword),
+      });
+    });
+  }
+
+  function handleClearSearch() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        ram: "ram",
+        clearSearch: true,
+      });
+    });
   }
 
   return (
@@ -160,16 +184,34 @@ function App() {
       </div>
       <div id="search-&-Navigate" className="row flex flex-edges">
         <div id="search">
-          <Button variant="outlined">
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={handleSearch}
+            style={{ borderRadius: "10px 0 0 10px" }}
+          >
             <MdOutlineSearch
               size={"1.4rem"}
               style={{ marginRight: "4px", marginTop: "2px" }}
             />
             Search
           </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={handleClearSearch}
+            style={{ borderRadius: "0 10px 10px 0" }}
+          >
+            <AiOutlineClear
+              size={"1.4rem"}
+              style={{ marginRight: "4px", marginTop: "2px" }}
+            />
+            clear
+          </Button>
         </div>
         <div id="navigate" className="flex">
           <Button
+            size="small"
             className="nav-button"
             id="find-prev"
             variant="outlined"
@@ -182,6 +224,7 @@ function App() {
             Back
           </Button>
           <Button
+            size="small"
             id="find-next"
             className="nav-button"
             variant="outlined"
@@ -199,32 +242,3 @@ function App() {
   );
 }
 export default App;
-
-/*
-  <IconButton
-                variant="outlined"
-                color="neutral"
-                onClick={addEmoji("👍")}
-              >
-                👍
-              </IconButton>
-              <IconButton
-                variant="outlined"
-                color="neutral"
-                onClick={addEmoji("🏖")}
-              >
-                🏖
-              </IconButton>
-              <IconButton
-                variant="outlined"
-                color="neutral"
-                onClick={addEmoji("😍")}
-              >
-                😍
-              </IconButton>
-}
-*/
-
-// function spacing(num) {
-//   return <> </>;
-// }
