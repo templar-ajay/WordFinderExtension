@@ -11,7 +11,6 @@ import { MdOutlineSearch } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { AiOutlineClear } from "react-icons/ai";
-//
 
 const levels = [
   {
@@ -27,6 +26,16 @@ const levels = [
     label: "high",
   },
 ];
+
+function sendMessage(type, data) {
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    searchRes = await chrome.tabs.sendMessage(tabs[0].id, {
+      ram: "ram",
+      type: type,
+      data: data,
+    });
+  });
+}
 
 function valueText(value) {
   if (value == 1) {
@@ -45,7 +54,7 @@ function App() {
   };
 
   const [text, setText] = useState("");
-  const addEmoji = (emoji) => () => setText(`${text}${emoji}`);
+  const [currentHighlighted, setCurrentHighlighted] = useState(0);
 
   const [keywords, setKeywords] = useState([
     { id: 1, keyword: "hello", hover: false },
@@ -68,25 +77,26 @@ function App() {
   }
 
   function handleSearch() {
-    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-      const clearRes = await chrome.tabs.sendMessage(tabs[0].id, {
-        ram: "ram",
-        clearSearch: true,
-      });
-      const searchRes = await chrome.tabs.sendMessage(tabs[0].id, {
-        ram: "ram",
-        search: keywords.map((x) => x.keyword),
-      });
-    });
+    if (keywords.length) {
+      sendMessage("clearSearch");
+      sendMessage(
+        "search",
+        keywords.map((x) => x.keyword)
+      );
+    }
   }
 
   function handleClearSearch() {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        ram: "ram",
-        clearSearch: true,
-      });
-    });
+    sendMessage("clearSearch");
+  }
+
+  function handlePrevious() {
+    sendMessage("moveHighlighted", "previous");
+    console.log("previous clicked");
+  }
+  function handleNext() {
+    sendMessage("moveHighlighted", "next");
+    console.log("next clicked");
   }
 
   return (
@@ -216,6 +226,7 @@ function App() {
             id="find-prev"
             variant="outlined"
             style={{ borderRadius: "10px 0 0 10px" }}
+            onClick={handlePrevious}
           >
             <MdKeyboardArrowLeft
               size={"1.4rem"}
@@ -229,6 +240,7 @@ function App() {
             className="nav-button"
             variant="outlined"
             style={{ borderRadius: "0 10px 10px 0" }}
+            onClick={handleNext}
           >
             Next
             <MdKeyboardArrowRight

@@ -8,14 +8,24 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   );
   if (request.ram === "ram") {
     console.log("content script received a message", request);
-    if (request.search) findWord(request.search);
-    if (request.clearSearch) removeHighlighted();
+    switch (request.type) {
+      case "search":
+        findWord(request.data);
+        break;
+      case "clearSearch":
+        removeHighlighted();
+        break;
+      case "moveHighlighted":
+        moveCurrentHighlighted(request.data);
+        break;
+      // code block
+    }
+
     sendResponse({ jaiShreeRam: "jaiShreeRam" });
   }
 });
 
 function findWord(wordsArray) {
-  //
   const word = new RegExp(wordsArray.join("|"), "gi");
   console.log("find Word called");
   const allElements = Array.from(
@@ -27,7 +37,6 @@ function findWord(wordsArray) {
     if (element.tagName == "IMG") return false;
     return true;
   });
-  // returns all the nodes that have the word and are text nodes(not the parents of the text node)
   // el.nodeType ===3 means element is a text node
 
   // console.log("allElements", allElements);
@@ -36,10 +45,15 @@ function findWord(wordsArray) {
     return word.test(getTextOfElement(el));
   });
   // console.log("foundElements", foundElements);
-  // if (document.querySelector("._highlighted")) removeHighlighted();
   // wrap found words in span
   highlightElements(foundElements, word);
+  currentHighlightFirst();
 }
+
+function currentHighlightFirst() {
+  document.querySelector("._highlighted").classList.add("_current-highlighted");
+}
+
 function getTextOfElement(element) {
   var selected = element.cloneNode(true);
   var text;
@@ -80,4 +94,38 @@ function removeHighlighted() {
   document
     .querySelectorAll("span._highlighted")
     .forEach((el) => unwrapWordFromSpan(el));
+}
+
+function moveCurrentHighlighted(direction) {
+  console.log("moveCurrentHighlighted called");
+  const allHighlighted = Array.from(
+    document.getElementsByClassName("_highlighted")
+  );
+  console.log(`allHighlighted`, allHighlighted);
+  // map ke baad filter lagana tha bhut time lag gya
+  const currentHighlightedIndex = allHighlighted
+    .map((x, i) => {
+      if (x.classList.contains("_current-highlighted")) return i;
+    })
+    .filter((x) => x == 0 || x)[0];
+  console.log("currentHighlightedIndex", currentHighlightedIndex);
+
+  console.log(`current Highlighted`, allHighlighted[currentHighlightedIndex]);
+
+  allHighlighted[currentHighlightedIndex].classList.remove(
+    "_current-highlighted"
+  );
+  console.log("removed _current-highlighted");
+
+  const nextIndex =
+    direction == "next"
+      ? allHighlighted.length > currentHighlightedIndex
+        ? currentHighlightedIndex + 1
+        : 0
+      : 0 < currentHighlightedIndex
+      ? currentHighlightedIndex - 1
+      : allHighlighted.length - 1;
+  console.log("nextIndex", nextIndex);
+  allHighlighted[nextIndex].classList.add("_current-highlighted");
+  console.log("added current-highlighted to ", allHighlighted[nextIndex]);
 }
