@@ -35,6 +35,8 @@ function findWord(wordsArray) {
   ).filter((element) => {
     if (element.tagName == "A") return false;
     if (element.tagName == "IMG") return false;
+    if (element.style.display == "none") return false;
+    if (!element.checkVisibility()) return false;
     return true;
   });
   // el.nodeType ===3 means element is a text node
@@ -51,7 +53,9 @@ function findWord(wordsArray) {
 }
 
 function currentHighlightFirst() {
-  document.querySelector("._highlighted").classList.add("_current-highlighted");
+  const firstElement = document.querySelector("._highlighted");
+  firstElement.classList.add("_current-highlighted");
+  scrollElementIntoView(firstElement);
 }
 
 function getTextOfElement(element) {
@@ -101,6 +105,7 @@ function moveCurrentHighlighted(direction) {
   const allHighlighted = Array.from(
     document.getElementsByClassName("_highlighted")
   );
+
   console.log(`allHighlighted`, allHighlighted);
   // map ke baad filter lagana tha bhut time lag gya
   const currentHighlightedIndex = allHighlighted
@@ -119,7 +124,7 @@ function moveCurrentHighlighted(direction) {
 
   const nextIndex =
     direction == "next"
-      ? allHighlighted.length > currentHighlightedIndex
+      ? allHighlighted.length - 1 > currentHighlightedIndex
         ? currentHighlightedIndex + 1
         : 0
       : 0 < currentHighlightedIndex
@@ -127,5 +132,14 @@ function moveCurrentHighlighted(direction) {
       : allHighlighted.length - 1;
   console.log("nextIndex", nextIndex);
   allHighlighted[nextIndex].classList.add("_current-highlighted");
+  scrollElementIntoView(allHighlighted[nextIndex]);
   console.log("added current-highlighted to ", allHighlighted[nextIndex]);
+}
+
+function scrollElementIntoView(el) {
+  el.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+    inline: "nearest",
+  });
 }

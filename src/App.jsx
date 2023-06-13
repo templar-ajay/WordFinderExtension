@@ -29,7 +29,7 @@ const levels = [
 
 function sendMessage(type, data) {
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-    searchRes = await chrome.tabs.sendMessage(tabs[0].id, {
+    chrome.tabs.sendMessage(tabs[0].id, {
       ram: "ram",
       type: type,
       data: data,
