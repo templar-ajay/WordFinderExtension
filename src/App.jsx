@@ -11,6 +11,7 @@ import { MdOutlineSearch } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { AiOutlineClear } from "react-icons/ai";
+import synonyms from "synonyms";
 
 const levels = [
   {
@@ -38,23 +39,82 @@ function sendMessage(type, data) {
 }
 
 function valueText(value) {
-  if (value == 1) {
+  if (value == 0) {
     return "low";
-  } else if (value == 2) {
+  } else if (value == 50) {
     return "medium";
-  } else if (value == 3) {
+  } else if (value == 100) {
     return "high";
   }
 }
+function getSynonyms(word, number) {
+  const result = synonyms(word);
+  console.log("result", result);
+  const resultSet = new Set([word]);
+  for (const x in result) {
+    result[x].forEach((y) => resultSet.add(y));
+  }
+  // filter out one word synonyms
+  return new Set(
+    Array.from(resultSet).filter((x, i) => i < number && x.length >= 2)
+  );
+}
 
 function App() {
-  const [synonyms, setSynonyms] = useState(false);
+  const [synonymsEnabled, setSynonymsEnabled] = useState(false);
+  const [synonymsLevel, setSynonymsLevel] = useState(0);
+  const [text, setText] = useState("");
   const handleChange = (event) => {
-    setSynonyms(event.target.checked);
+    setSynonymsEnabled(event.target.checked);
+  };
+  const handleSynonymsLevelChange = (event) => {
+    setSynonymsLevel(event.target.value);
   };
 
-  const [text, setText] = useState("");
-  const [currentHighlighted, setCurrentHighlighted] = useState(0);
+  const handleTextAreaInput = (event) => {
+    const inputValue = event.target.value;
+    if (
+      inputValue.includes(",") &&
+      inputValue.length > 2 &&
+      (inputValue[inputValue.length - 2] != "," || true)
+    ) {
+      const theKeyword = inputValue.split(",")[0].trim();
+
+      if (!synonymsEnabled) {
+        /**
+      add single keyword
+      */
+        addKeyword({
+          id: Math.random() * 1000000,
+          keyword: theKeyword,
+          hover: false,
+        });
+      } else {
+        /**
+        add keyword and it's synonyms
+        */
+        console.log("imported synonyms module", synonyms);
+        console.log(`theKeyword`, theKeyword);
+
+        let num_synonyms = 3;
+        if (synonymsLevel == 50) {
+          num_synonyms = 5;
+        } else if (synonymsLevel == 100) {
+          num_synonyms = 10000000;
+        }
+        const theSynonymsSet = getSynonyms(theKeyword, num_synonyms);
+
+        console.log("theSynonymsSet", theSynonymsSet);
+
+        addKeywords(Array.from(theSynonymsSet));
+      }
+
+      //
+      setText("");
+    } else if (inputValue.includes(",")) {
+      setText("");
+    } else setText(inputValue);
+  };
 
   const [keywords, setKeywords] = useState([
     { id: 1, keyword: "hello", hover: false },
@@ -71,9 +131,26 @@ function App() {
     setKeywords([...keywords.filter((x) => (x.id != id ? true : false))]);
   }
   function addKeyword(keyword = { id: 3, keyword: "new", hover: false }) {
-    if (!keywords.find((x) => x.id === keyword?.id)) {
+    if (
+      !keywords.find(
+        (x) => x.id === keyword?.id || x.keyword === keyword.keyword
+      )
+    ) {
       setKeywords([...keywords, keyword]);
     }
+  }
+  function addKeywords(_keywords) {
+    // purge duplicate keywords
+    const keywordsArray = _keywords.map((k, i) => {
+      return { id: Math.random() * 1000000, keyword: k, hover: false };
+    });
+    const filteredKeywords = keywordsArray.filter(
+      (k) => !keywords.some((x) => x.keyword == k.keyword || x.id == k.id)
+    );
+    console.log("filteredKeywords", filteredKeywords);
+
+    console.log("keywordsArray", filteredKeywords);
+    setKeywords([...keywords, ...filteredKeywords]);
   }
 
   function handleSearch() {
@@ -116,21 +193,22 @@ function App() {
               alignSelf: "center",
             }}
           >
-            Synonyms {synonyms ? "Enabled" : "Disabled"}
+            Synonyms {synonymsEnabled ? "Enabled" : "Disabled"}
           </label>
-          <Switch checked={synonyms} onChange={handleChange} />
+          <Switch checked={synonymsEnabled} onChange={handleChange} />
         </Box>
 
         <Box sx={{ width: 120 }}>
           <label>Select Synonym Level</label>
           <Slider
             aria-label="Always visible"
-            defaultValue={0}
+            value={synonymsLevel}
             getAriaValueText={valueText}
             step={50}
             marks={levels}
             valueLabelDisplay="off"
-            disabled={!synonyms}
+            onChange={handleSynonymsLevelChange}
+            disabled={!synonymsEnabled}
           />
         </Box>
       </div>
@@ -140,24 +218,7 @@ function App() {
           maxRows={2}
           placeholder="Type your keywords here..."
           value={text}
-          onChange={(event) => {
-            const inputValue = event.target.value;
-            if (
-              inputValue.includes(",") &&
-              inputValue.length > 2 &&
-              (inputValue[inputValue.length - 2] != "," || true)
-            ) {
-              const theKeyword = inputValue.split(",")[0].trim();
-              addKeyword({
-                id: Math.random() * 100000,
-                keyword: theKeyword,
-                hover: false,
-              });
-              setText("");
-            } else if (inputValue.includes(",")) {
-              setText("");
-            } else setText(inputValue);
-          }}
+          onChange={handleTextAreaInput}
           endDecorator={
             <JoyBox sx={{ display: "flex-inline", gap: 0.5 }}>
               {keywords.map((keyword) => (
@@ -253,4 +314,5 @@ function App() {
     </>
   );
 }
+
 export default App;
