@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Switch from "@mui/joy/Switch";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
@@ -6,12 +6,12 @@ import { Box as JoyBox } from "@mui/joy/";
 import Button from "@mui/joy/Button";
 import Textarea from "@mui/joy/Textarea";
 import Typography from "@mui/joy/Typography";
-import { MdDeleteForever } from "react-icons/md";
 import { MdOutlineSearch } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { AiOutlineClear } from "react-icons/ai";
 import synonyms from "synonyms";
+import KeywordButton from "./components/partial components/KeywordButton.jsx";
 
 const levels = [
   {
@@ -30,11 +30,17 @@ const levels = [
 
 function sendMessage(type, data) {
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      ram: "ram",
-      type: type,
-      data: data,
-    });
+    chrome.tabs.sendMessage(
+      tabs[0].id,
+      {
+        ram: "ram",
+        type: type,
+        data: data,
+      },
+      function (response) {
+        if (response) console.log(response);
+      }
+    );
   });
 }
 
@@ -59,11 +65,39 @@ function getSynonyms(word, number) {
     Array.from(resultSet).filter((x, i) => i < number && x.length >= 2)
   );
 }
-
+async function getKeywords() {
+  const { keywords } = await chrome.storage.local.get(["keywords"]);
+  return keywords;
+}
+async function saveKeywords(keywords) {
+  chrome.storage.local.set({ keywords: keywords }, function () {
+    getKeywords().then((keywords) => console.log("getKeywords()", keywords));
+  });
+}
 function App() {
   const [synonymsEnabled, setSynonymsEnabled] = useState(false);
   const [synonymsLevel, setSynonymsLevel] = useState(0);
   const [text, setText] = useState("");
+  const [keywords, setKeywords] = useState([]);
+
+  useEffect(() => {
+    chrome.storage.local.get(["keywords"], function (result) {
+      const { keywords } = result;
+      // Use the retrieved values
+      console.log("retrieved keywords from app.jsx", keywords);
+      setKeywords(keywords);
+    });
+  }, []);
+  // save and sync keywords in local storage
+  useEffect(() => {
+    (async () => {
+      if ((await getKeywords()) !== keywords) {
+        console.log("saving keywords", keywords);
+        saveKeywords(keywords);
+      }
+    })();
+  }, [keywords]);
+
   const handleChange = (event) => {
     setSynonymsEnabled(event.target.checked);
   };
@@ -87,7 +121,6 @@ function App() {
         addKeyword({
           id: Math.random() * 1000000,
           keyword: theKeyword,
-          hover: false,
         });
       } else {
         /**
@@ -116,21 +149,11 @@ function App() {
     } else setText(inputValue);
   };
 
-  const [keywords, setKeywords] = useState([
-    { id: 1, keyword: "hello", hover: false },
-    { id: 2, keyword: "hi", hover: false },
-  ]);
-  function setHover(id, boolean) {
-    setKeywords([
-      ...keywords.map((x) =>
-        x.id == id ? { ...x, hover: boolean } : { ...x, hover: false }
-      ),
-    ]);
-  }
   function deleteKeyword(id) {
     setKeywords([...keywords.filter((x) => (x.id != id ? true : false))]);
   }
-  function addKeyword(keyword = { id: 3, keyword: "new", hover: false }) {
+
+  function addKeyword(keyword = { id: 3, keyword: "new" }) {
     if (
       !keywords.find(
         (x) => x.id === keyword?.id || x.keyword === keyword.keyword
@@ -141,8 +164,8 @@ function App() {
   }
   function addKeywords(_keywords) {
     // purge duplicate keywords
-    const keywordsArray = _keywords.map((k, i) => {
-      return { id: Math.random() * 1000000, keyword: k, hover: false };
+    const keywordsArray = _keywords.map((k) => {
+      return { id: Math.random() * 1000000, keyword: k };
     });
     const filteredKeywords = keywordsArray.filter(
       (k) => !keywords.some((x) => x.keyword == k.keyword || x.id == k.id)
@@ -222,23 +245,13 @@ function App() {
           endDecorator={
             <JoyBox sx={{ display: "flex-inline", gap: 0.5 }}>
               {keywords.map((keyword) => (
-                <Button
+                <KeywordButton
                   key={keyword.id}
-                  style={{
-                    margin: "4px",
-                  }}
-                  id={"keyword-" + keyword.id}
-                  variant="outlined"
-                  color="neutral"
-                  onMouseOver={() => setHover(keyword.id, true)}
-                  onMouseOut={() => setHover(keyword.id, false)}
-                  onClick={() => {
-                    deleteKeyword(keyword.id);
-                  }}
+                  keywordID={keyword.id}
+                  handleClick={deleteKeyword}
                 >
-                  {keyword.hover && <MdDeleteForever />}
-                  {"  "} {keyword.keyword}
-                </Button>
+                  {keyword.keyword}
+                </KeywordButton>
               ))}
             </JoyBox>
           }

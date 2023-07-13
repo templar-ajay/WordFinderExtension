@@ -18,9 +18,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       case "moveHighlighted":
         moveCurrentHighlighted(request.data);
         break;
-      // code block
     }
-
     sendResponse({ jaiShreeRam: "jaiShreeRam" });
   }
 });
@@ -121,7 +119,7 @@ function moveCurrentHighlighted(direction) {
   );
 
   console.log(`allHighlighted`, allHighlighted);
-  // map ke baad filter lagana tha bhut time lag gya
+
   const currentHighlightedIndex = allHighlighted
     .map((x, i) => {
       if (x.classList.contains("_current-highlighted")) return i;
