@@ -67,7 +67,7 @@ function getSynonyms(word, number) {
 }
 async function getKeywords() {
   const { keywords } = await chrome.storage.local.get(["keywords"]);
-  return keywords;
+  return keywords ? keywords : [];
 }
 async function saveKeywords(keywords) {
   chrome.storage.local.set({ keywords: keywords }, function () {
@@ -82,7 +82,7 @@ function App() {
 
   useEffect(() => {
     chrome.storage.local.get(["keywords"], function (result) {
-      const { keywords } = result;
+      const { keywords } = result ? result : { keywords: [] };
       // Use the retrieved values
       console.log("retrieved keywords from app.jsx", keywords);
       setKeywords(keywords);
@@ -244,7 +244,7 @@ function App() {
           onChange={handleTextAreaInput}
           endDecorator={
             <JoyBox sx={{ display: "flex-inline", gap: 0.5 }}>
-              {keywords.map((keyword) => (
+              {(keywords ? keywords : []).map((keyword) => (
                 <KeywordButton
                   key={keyword.id}
                   keywordID={keyword.id}
