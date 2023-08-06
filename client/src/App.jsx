@@ -12,6 +12,11 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import { AiOutlineClear } from "react-icons/ai";
 import synonyms from "synonyms";
 import KeywordButton from "./components/partial components/KeywordButton.jsx";
+import {
+  sendMessage,
+  getKeywords,
+  saveKeywords,
+} from "./helpers/ChromeHelpers.js";
 
 const levels = [
   {
@@ -28,52 +33,6 @@ const levels = [
   },
 ];
 
-function sendMessage(type, data) {
-  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-    chrome.tabs.sendMessage(
-      tabs[0].id,
-      {
-        ram: "ram",
-        type: type,
-        data: data,
-      },
-      function (response) {
-        if (response) console.log(response);
-      }
-    );
-  });
-}
-
-function valueText(value) {
-  if (value == 0) {
-    return "low";
-  } else if (value == 50) {
-    return "medium";
-  } else if (value == 100) {
-    return "high";
-  }
-}
-function getSynonyms(word, number) {
-  const result = synonyms(word);
-  console.log("result", result);
-  const resultSet = new Set([word]);
-  for (const x in result) {
-    result[x].forEach((y) => resultSet.add(y));
-  }
-  // filter out one word synonyms
-  return new Set(
-    Array.from(resultSet).filter((x, i) => i < number && x.length >= 2)
-  );
-}
-async function getKeywords() {
-  const { keywords } = await chrome.storage.local.get(["keywords"]);
-  return keywords ? keywords : [];
-}
-async function saveKeywords(keywords) {
-  chrome.storage.local.set({ keywords: keywords }, function () {
-    getKeywords().then((keywords) => console.log("getKeywords()", keywords));
-  });
-}
 function App() {
   const [synonymsEnabled, setSynonymsEnabled] = useState(false);
   const [synonymsLevel, setSynonymsLevel] = useState(0);
@@ -98,12 +57,10 @@ function App() {
     })();
   }, [keywords]);
 
-  const handleChange = (event) => {
-    setSynonymsEnabled(event.target.checked);
-  };
-  const handleSynonymsLevelChange = (event) => {
+  const handleChange = (event) => setSynonymsEnabled(event.target.checked);
+
+  const handleSynonymsLevelChange = (event) =>
     setSynonymsLevel(event.target.value);
-  };
 
   const handleTextAreaInput = (event) => {
     const inputValue = event.target.value;
@@ -162,6 +119,7 @@ function App() {
       setKeywords([...keywords, keyword]);
     }
   }
+
   function addKeywords(_keywords) {
     // purge duplicate keywords
     const keywordsArray = _keywords.map((k) => {
@@ -194,6 +152,7 @@ function App() {
     sendMessage("moveHighlighted", "previous");
     console.log("previous clicked");
   }
+
   function handleNext() {
     sendMessage("moveHighlighted", "next");
     console.log("next clicked");
