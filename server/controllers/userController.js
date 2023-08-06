@@ -14,6 +14,23 @@ class UserController {
         })
       );
   }
+
+  static async loginUser(req, res) {
+    const { email, name, password } = req.body;
+
+    try {
+      const payload = await userSchema.findOne({
+        $or: [{ email: email }, { name: name }]
+      });
+      if (!payload) return res.status(404).send("User not found");
+
+      payload.password === password
+        ? res.send({ data: payload, message: "Login Success" })
+        : res.send({ message: "Wrong Password" });
+    } catch (err) {
+      res.send({ error: err });
+    }
+  }
 }
 
 module.exports = UserController;
