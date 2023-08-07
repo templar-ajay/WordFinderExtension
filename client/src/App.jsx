@@ -12,25 +12,21 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import { AiOutlineClear } from "react-icons/ai";
 import synonyms from "synonyms";
 import KeywordButton from "./components/partial components/KeywordButton.jsx";
-import {
-  sendMessage,
-  getKeywords,
-  saveKeywords,
-} from "./helpers/ChromeHelpers.js";
+import { sendMessage, getKeywords, saveKeywords } from "./helpers/ChromeHelpers.js";
 
 const levels = [
   {
     value: 0,
-    label: "low",
+    label: "low"
   },
   {
     value: 50,
-    label: "medium",
+    label: "medium"
   },
   {
     value: 100,
-    label: "high",
-  },
+    label: "high"
+  }
 ];
 
 function App() {
@@ -59,8 +55,7 @@ function App() {
 
   const handleChange = (event) => setSynonymsEnabled(event.target.checked);
 
-  const handleSynonymsLevelChange = (event) =>
-    setSynonymsLevel(event.target.value);
+  const handleSynonymsLevelChange = (event) => setSynonymsLevel(event.target.value);
 
   const handleTextAreaInput = (event) => {
     const inputValue = event.target.value;
@@ -77,7 +72,7 @@ function App() {
       */
         addKeyword({
           id: Math.random() * 1000000,
-          keyword: theKeyword,
+          keyword: theKeyword
         });
       } else {
         /**
@@ -111,11 +106,7 @@ function App() {
   }
 
   function addKeyword(keyword = { id: 3, keyword: "new" }) {
-    if (
-      !keywords.find(
-        (x) => x.id === keyword?.id || x.keyword === keyword.keyword
-      )
-    ) {
+    if (!keywords.find((x) => x.id === keyword?.id || x.keyword === keyword.keyword)) {
       setKeywords([...keywords, keyword]);
     }
   }
@@ -166,13 +157,13 @@ function App() {
             width: 120,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "flex-start",
+            justifyContent: "flex-start"
           }}
         >
           <label
             style={{
               marginBottom: "10px",
-              alignSelf: "center",
+              alignSelf: "center"
             }}
           >
             Synonyms {synonymsEnabled ? "Enabled" : "Disabled"}
@@ -204,11 +195,7 @@ function App() {
           endDecorator={
             <JoyBox sx={{ display: "flex-inline", gap: 0.5 }}>
               {(keywords ? keywords : []).map((keyword) => (
-                <KeywordButton
-                  key={keyword.id}
-                  keywordID={keyword.id}
-                  handleClick={deleteKeyword}
-                >
+                <KeywordButton key={keyword.id} keywordID={keyword.id} handleClick={deleteKeyword}>
                   {keyword.keyword}
                 </KeywordButton>
               ))}
@@ -233,10 +220,7 @@ function App() {
             onClick={handleSearch}
             style={{ borderRadius: "10px 0 0 10px" }}
           >
-            <MdOutlineSearch
-              size={"1.4rem"}
-              style={{ marginRight: "4px", marginTop: "2px" }}
-            />
+            <MdOutlineSearch size={"1.4rem"} style={{ marginRight: "4px", marginTop: "2px" }} />
             Search
           </Button>
           <Button
@@ -245,10 +229,7 @@ function App() {
             onClick={handleClearSearch}
             style={{ borderRadius: "0 10px 10px 0" }}
           >
-            <AiOutlineClear
-              size={"1.4rem"}
-              style={{ marginRight: "4px", marginTop: "2px" }}
-            />
+            <AiOutlineClear size={"1.4rem"} style={{ marginRight: "4px", marginTop: "2px" }} />
             clear
           </Button>
         </div>
@@ -261,10 +242,7 @@ function App() {
             style={{ borderRadius: "10px 0 0 10px" }}
             onClick={handlePrevious}
           >
-            <MdKeyboardArrowLeft
-              size={"1.4rem"}
-              style={{ marginRight: "4px", marginTop: "2px" }}
-            />
+            <MdKeyboardArrowLeft size={"1.4rem"} style={{ marginRight: "4px", marginTop: "2px" }} />
             Back
           </Button>
           <Button
@@ -276,10 +254,7 @@ function App() {
             onClick={handleNext}
           >
             Next
-            <MdKeyboardArrowRight
-              size={"1.4rem"}
-              style={{ marginLeft: "4px", marginTop: "2px" }}
-            />
+            <MdKeyboardArrowRight size={"1.4rem"} style={{ marginLeft: "4px", marginTop: "2px" }} />
           </Button>
         </div>
       </div>

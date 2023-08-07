@@ -10,15 +10,9 @@ export default function KeywordButton({ children, keywordID, handleClick }) {
       style={{ margin: "4px" }}
       variant="outlined"
       color="neutral"
-      onMouseOver={() => {
-        setHover(true);
-      }}
-      onMouseOut={() => {
-        setHover(false);
-      }}
-      onClick={() => {
-        handleClick(keywordID);
-      }}
+      onMouseOver={() => setHover(true)}
+      onMouseOut={() => setHover(false)}
+      onClick={() => handleClick(keywordID)}
     >
       {hover && <MdDeleteForever />}
       {children}

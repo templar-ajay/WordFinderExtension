@@ -5,7 +5,7 @@ export function sendMessage(type, data) {
       {
         ram: "ram",
         type: type,
-        data: data,
+        data: data
       },
       function (response) {
         if (response) console.log(response);
