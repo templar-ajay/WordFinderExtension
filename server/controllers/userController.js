@@ -1,17 +1,15 @@
 const userSchema = require("../models/userSchema.js");
+const validator = require("../services/validator.js");
+const bcrypt = require("bcrypt");
 
 class UserController {
-  static async getUsers(req, res) {
-    await userSchema
+  static getUsers(req, res) {
+    userSchema
       .find()
-      .select(req.body.query ? req.body.query : "_id name email password")
+      .select(req.body.select ? req.body.select : "_id name email password")
       .then((users) => res.send({ total: users.length, data: users }))
       .catch((err) =>
-        res.send({
-          error: err,
-          TimeStamp: Date(),
-          handlerLocation: "UserController.getUser"
-        })
+        res.send({ error: err, TimeStamp: Date(), message: "error: UserController.getUser" })
       );
   }
 
@@ -19,16 +17,30 @@ class UserController {
     const { email, name, password } = req.body;
 
     try {
-      const payload = await userSchema.findOne({
-        $or: [{ email: email }, { name: name }]
-      });
-      if (!payload) return res.status(404).send("User not found");
+      const matchedUser = await userSchema.findOne({ $or: [{ email: email }, { name: name }] });
+      if (!matchedUser || matchedUser.otp) return res.status(404).send("User not found");
 
-      payload.password === password
-        ? res.send({ data: payload, message: "Login Success" })
+      matchedUser.password === password
+        ? res.send({ data: matchedUser, message: "Login Success" })
         : res.send({ message: "Wrong Password" });
     } catch (err) {
-      res.send({ error: err });
+      res.send({ error: err, TimeStamp: Date(), message: "error: UserController.loginUser" });
+    }
+  }
+
+  static async createUser(req, res) {
+    try {
+      if (validator.checkWeakPassword(req, res) || (await validator.checkUserExisted(req, res)))
+        return;
+
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      console.log("aaya");
+      const user = await new userSchema({ ...req.body, password: hashedPassword });
+
+      await user.save();
+      res.send({ data: user, message: "user registration success" });
+    } catch (error) {
+      res.send({ error: error, TimeStamp: Date(), message: "error: UserController.createUser" });
     }
   }
 }
