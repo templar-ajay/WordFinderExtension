@@ -14,5 +14,17 @@ module.exports = {
           });
         });
     }, duration);
+  },
+
+  checkOtp: async function (email, otp) {
+    try {
+      const report = await userSchema.findOneAndUpdate(
+        { $and: [{ email: email }, { otp: otp }] },
+        { $unset: { otp: 1 } }
+      );
+      return { message: !report ? "OTP doesn't match" : "verification success", report: report };
+    } catch (error) {
+      return { error: error, TimeStamp: Date(), message: "error: otpManager.checkOtp" };
+    }
   }
 };

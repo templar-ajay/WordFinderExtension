@@ -1,6 +1,7 @@
 const userSchema = require("../models/userSchema.js");
 const otpManager = require("../services/otpManager.js");
 const validator = require("../services/validator.js");
+const SendMail = require("../services/mailer.js");
 const bcrypt = require("bcrypt");
 
 class UserController {
@@ -40,9 +41,39 @@ class UserController {
         randomNum.length < 6 ? randomNum + Math.floor(Math.random() * 10).toString() : randomNum;
       const user = await new userSchema({ ...req.body, password: hashedPassword, otp: otp });
 
+      await SendMail(
+        process.env.APP_ID,
+        process.env.APP_PASSWORD,
+        user.email,
+        "Otp for verify your email address",
+        `<h1>Word Finder</h1><br/>
+        <h3>Your otp(One Time Password) is ${otp} </h3><br/>
+        <h4>This otp is expired in 2 minutes</h4><br/>
+        <h5>We hope you find our service cool.</h5><br/>`
+      );
       await user.save();
       otpManager.otpCleaner(125000, user);
-      res.send({ data: user, message: "user registration success" });
+      res.send({ data: user, message: "Please verify email using otp sent to your mail address" });
+    } catch (error) {
+      res.send({ error: error, TimeStamp: Date(), message: "error: UserController.createUser" });
+    }
+  }
+
+  static async verifyOtp(req, res) {
+    try {
+      const { email, otp } = req.body;
+      if (!otp || !email)
+        return res.send({
+          message: "Validation Error",
+          error: { message: "Otp & email are required." }
+        });
+
+      const report = await otpManager.checkOtp(email, otp);
+      res.send(
+        !report && report.message.includes("success")
+          ? { data: report, message: "email verification success" }
+          : report
+      );
     } catch (error) {
       res.send({ error: error, TimeStamp: Date(), message: "error: UserController.createUser" });
     }
