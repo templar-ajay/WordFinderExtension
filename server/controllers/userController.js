@@ -3,6 +3,7 @@ const otpManager = require("../services/otpManager.js");
 const validator = require("../services/validator.js");
 const SendMail = require("../services/mailer.js");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 class UserController {
   static getUsers(req, res) {
@@ -19,12 +20,23 @@ class UserController {
     const { email, name, password } = req.body;
 
     try {
-      const matchedUser = await userSchema.findOne({ $or: [{ email: email }, { name: name }] });
-      if (!matchedUser || matchedUser.otp) return res.status(404).send("User not found");
+      const user = await userSchema.findOne({ $or: [{ email: email }, { name: name }] });
+      if (!user || user.otp) return res.status(404).send("User not found");
 
-      (await bcrypt.compare(password, matchedUser.password))
-        ? res.send({ data: matchedUser, message: "Login Success" })
-        : res.send({ message: "Wrong Password" });
+      const validCredentials = await bcrypt.compare(password, user.password);
+      if (!validCredentials) return res.send({ message: "Wrong Password" });
+
+      const accessToken = jwt.sign(JSON.parse(JSON.stringify(user)), process.env.TOKEN_SECRET, {
+        expiresIn: "7d"
+      });
+      res
+        .cookie("authToken", accessToken, {
+          sameSite: "strict",
+          path: "/",
+          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          httpOnly: true
+        })
+        .send({ data: user, message: "Login Success" });
     } catch (err) {
       res.send({ error: err, TimeStamp: Date(), message: "error: UserController.loginUser" });
     }

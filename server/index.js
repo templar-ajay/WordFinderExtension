@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const connectDb = require("./db/index.js");
 const userRoutes = require("./routes/userRoutes.js");
 const cookieParser = require("cookie-parser");
+const auth = require("./middlewares/auth.js");
 
 const app = express();
 dotenv.config();
@@ -22,7 +23,9 @@ app.use(express.json());
 
 connectDb(); // database connection
 
-app.get("/", (req, res) => res.send(req.decoded));
+app.get("/", auth, (req, res) => {
+  res.send({ data: req.decode, message: "user authetication success" });
+});
 app.use("/user", userRoutes);
 
 app.listen(port, () =>
