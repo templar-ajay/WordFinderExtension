@@ -30,11 +30,12 @@ const levels = [
   }
 ];
 
-export default function Home() {
+export default function Home({ user, setState }) {
   const [synonymsEnabled, setSynonymsEnabled] = useState(false);
   const [synonymsLevel, setSynonymsLevel] = useState(0);
   const [text, setText] = useState("");
   const [keywords, setKeywords] = useState([]);
+  console.log(user, setState, "/");
 
   useEffect(() => {
     chrome.storage.local.get(["keywords"], function (result) {
