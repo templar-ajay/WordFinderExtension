@@ -14,6 +14,7 @@ import synonyms from "synonyms";
 import KeywordButton from "./partial components/KeywordButton.jsx";
 import { sendMessage, getKeywords, saveKeywords } from "../helpers/ChromeHelpers.js";
 import { valueText } from "../helpers/UtilityHelpers.js";
+import axios from "axios";
 
 const levels = [
   {
@@ -30,7 +31,7 @@ const levels = [
   }
 ];
 
-export default function Home({ user, setState }) {
+export default function Home({ user, setState, setUser }) {
   const [synonymsEnabled, setSynonymsEnabled] = useState(false);
   const [synonymsLevel, setSynonymsLevel] = useState(0);
   const [text, setText] = useState("");
@@ -150,8 +151,28 @@ export default function Home({ user, setState }) {
     sendMessage("moveHighlighted", "next");
     console.log("next clicked");
   }
+
+  function handleLogout() {
+    axios
+      .get(`http://localhost:4000/user/logout`)
+      .then((response) => {
+        setUser(null);
+        setState({ route: "/login" });
+      })
+      .catch((error) => {
+        console.log(error.response);
+        alert("Internal server error");
+      });
+  }
+
   return (
     <>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <label>Welcome {user?.name} on Word-Finder</label>
+        <Button onClick={handleLogout} variant="outlined">
+          Log Out
+        </Button>
+      </Box>
       <div id="synonyms-div" className="flex row">
         <Box
           sx={{

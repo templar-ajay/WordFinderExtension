@@ -6,15 +6,24 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import axios from "axios";
 
-export default function Login({ setState }) {
-  const handleSubmit = (event) => {
+export default function Login({ setState, setUser }) {
+  const handleLogin = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password")
-    });
+    const [email, password] = [...new FormData(event.currentTarget).values()];
+
+    axios
+      .post(`http://localhost:4000/user/login`, { email, name: email, password })
+      .then((response) => {
+        setUser(response.data.data);
+        setState({ route: "/" });
+      })
+      .catch((error) => {
+        console.log(error);
+        const response = error.response;
+        alert([404, 401].includes(response.status) ? response.data.message : response.statusText);
+      });
   };
   const handleSignup = (event) => {
     event.preventDefault();
@@ -34,13 +43,13 @@ export default function Login({ setState }) {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label="Email Address or Username"
             name="email"
             autoComplete="email"
             autoFocus

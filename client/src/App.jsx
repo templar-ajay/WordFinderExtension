@@ -11,17 +11,11 @@ function App() {
   const [State, setState] = useState({ route: "/" });
 
   useEffect(() => {
-    const token = document.cookie.authToken;
     setState({ route: "/loading" });
     axios
-      .get(`http://localhost:4000/`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `bearer ${token}`
-        }
-      })
+      .get(`http://localhost:4000/`)
       .then((response) => {
-        setUser(response.data);
+        setUser(response.data.data);
         setState({ route: "/" });
       })
       .catch((error) => {
@@ -31,11 +25,11 @@ function App() {
   }, []);
 
   return {
-    "/": <Home user={User} setState={setState} />,
+    "/": <Home user={User} setState={setState} setUser={setUser} />,
     "/error": <Error setState={setState} error={State.error} />,
     "/loading": <Loading message={"...loading"} />,
-    "/login": <Login setState={setState} />,
-    "/signup": <SignUp setState={setState} />
+    "/login": <Login setState={setState} setUser={setUser} />,
+    "/signup": <SignUp setState={setState} setUser={setUser} />
   }[State.route];
 }
 
