@@ -21,10 +21,10 @@ class UserController {
 
     try {
       const user = await userSchema.findOne({ $or: [{ email: email }, { name: name }] });
-      if (!user || user.otp) return res.status(404).send("User not found");
+      if (!user || user.otp) return res.status(404).send({ message: "User not found" });
 
       const validCredentials = await bcrypt.compare(password, user.password);
-      if (!validCredentials) return res.send({ message: "Wrong Password" });
+      if (!validCredentials) return res.status(401).send({ message: "Wrong Password" });
 
       const accessToken = jwt.sign(JSON.parse(JSON.stringify(user)), process.env.TOKEN_SECRET, {
         expiresIn: "7d"
@@ -40,6 +40,10 @@ class UserController {
     } catch (err) {
       res.send({ error: err, TimeStamp: Date(), message: "error: UserController.loginUser" });
     }
+  }
+
+  static logoutUser(req, res) {
+    res.clearCookie("authToken").send({ message: "token removed success" });
   }
 
   static async createUser(req, res) {
