@@ -25,11 +25,11 @@ A Chrome Extension to save keywords and search and navigate to then on webpages 
     - create a `.env` file and enter the following contents in it.
 
       ```.env
-      MONGO_URI="mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.3"
-      APP_ID="your email address"
-      APP_PASSWORD="generated email app password"
-      TOKEN_SECRET="secretKey"
-      ORIGIN="http://localhost:3000"
+      MONGO_URI=mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.3
+      APP_ID=your email address here
+      APP_PASSWORD=generated email app password, google "how to generate app password in a google account"
+      TOKEN_SECRET=yourSecretKeyHere
+      ORIGIN=http://localhost:3000
       ```
 
     - `npm run dev`
