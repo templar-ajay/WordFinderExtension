@@ -1,3 +1,4 @@
+import synonyms from "synonyms";
 export function valueText(value) {
   if (value == 0) {
     return "low";

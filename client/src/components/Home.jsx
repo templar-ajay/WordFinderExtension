@@ -13,7 +13,7 @@ import { AiOutlineClear } from "react-icons/ai";
 import synonyms from "synonyms";
 import KeywordButton from "./partial components/KeywordButton.jsx";
 import { sendMessage, getKeywords, saveKeywords } from "../helpers/ChromeHelpers.js";
-import { valueText } from "../helpers/UtilityHelpers.js";
+import { getSynonyms ,valueText} from "../helpers/UtilityHelpers.js";
 
 const levels = [
   {
