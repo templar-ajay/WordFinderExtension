@@ -20,7 +20,7 @@ function App() {
       })
       .catch((error) => {
         console.log(error);
-        setState({ route: error.response.status === 401 ? "/login" : "/error", error: error });
+        setState({ route: error.response?.status === 401 ? "/login" : "/error", error: error });
       });
   }, []);
 

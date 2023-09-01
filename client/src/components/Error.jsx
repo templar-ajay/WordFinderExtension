@@ -1,5 +1,11 @@
 import React from "react";
 
 export default function Error({ error, setState }) {
-  return <div>Error: {error.response.data.message}</div>;
+  return (
+    <div>
+      {error.response
+        ? "Error: " + error.response.data.message
+        : "Server under development, please be patient."}
+    </div>
+  );
 }
