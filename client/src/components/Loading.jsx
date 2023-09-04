@@ -5,8 +5,7 @@ export default function Loading({ message }) {
     <div className="loader-wrapper flex justify-content-center align-item-center">
       <div className="flex col">
         <div className="loader"></div>
-        <br />
-        <h4 className="text-center">{message ? message : "loading..."}</h4>
+        <h3 className="text-center">{message ? message : "loading..."}</h3>
       </div>
     </div>
   );

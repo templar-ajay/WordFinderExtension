@@ -12,6 +12,10 @@
   min-height: 320px;
 }
 
+.AppContainer {
+  padding-bottom: 50px;
+}
+
 hr {
   width: 100%;
   border: none;
@@ -30,12 +34,16 @@ form input {
   text-align: center;
 }
 
+.w-100 {
+  width: 100%;
+}
+.h-100 {
+  height: 100%;
+}
+
 .btn {
-  /* background-color: #4caf50; */
-  /* color: white; */
   padding: 10px 20px;
   border: none;
-  /* border-radius: 5px; */
   border-radius: 25px;
   cursor: pointer;
   font-size: 16px;
@@ -61,6 +69,16 @@ form input {
   justify-content: space-between;
 }
 
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+.fixed {
+  position: fixed;
+}
+
 .block {
   display: block;
 }
@@ -78,7 +96,7 @@ form input {
   border: 16px solid #f3f3f3;
   border-top: 16px solid #3498db;
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
+  width: 60px;
+  height: 60px;
   animation: spin 2s linear infinite;
 }

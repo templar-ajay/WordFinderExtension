@@ -45,6 +45,7 @@ export default function Home({ user, setState, setUser }) {
       console.log("retrieved keywords from app.jsx", keywords);
       setKeywords(keywords);
     });
+    !user && setState({ route: "/login", loading: false });
   }, []);
   // save and sync keywords in local storage
   useEffect(() => {
