@@ -25,7 +25,7 @@ export default function Login({ setState, setUser }) {
         alert([404, 401].includes(response.status) ? response.data.message : response.statusText);
       });
   };
-  const handleSignup = (event) => {
+  const gotoSignup = (event) => {
     event.preventDefault();
     setState({ route: "/signup" });
   };
@@ -71,14 +71,14 @@ export default function Login({ setState, setUser }) {
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
             Sign In
           </Button>
-          <Grid container>
+          <Grid container justifyContent="flex-end">
             {/* <Grid item xs>
               <Link href="#" variant="body2">
                 Forgot password?
               </Link>
             </Grid> */}
             <Grid item>
-              <Link onClick={handleSignup} variant="body2">
+              <Link onClick={gotoSignup} variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
