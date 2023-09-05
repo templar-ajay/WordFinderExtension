@@ -52,10 +52,12 @@ class UserController {
         return;
 
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      const randomNum = Math.floor(Math.random() * 1000000).toString();
-      const otp =
-        randomNum.length < 6 ? randomNum + Math.floor(Math.random() * 10).toString() : randomNum;
-      const user = await new userSchema({ ...req.body, password: hashedPassword, otp: otp });
+      let otp = Math.floor(Math.random() * 1000000).toString();
+      while (true) {
+        if (otp.length > 5) break;
+        otp = otp + Math.floor(Math.random() * 10).toString();
+      }
+      const user = await new userSchema({ ...req.body, password: hashedPassword, otp });
 
       await SendMail(
         process.env.APP_ID,
