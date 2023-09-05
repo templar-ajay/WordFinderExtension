@@ -17,17 +17,27 @@ module.exports = {
   },
 
   checkUserExisted: async function (req, res) {
-    if (await userSchema.findOne({ email: req.body.email }))
+    const userByEmail = await userSchema.findOne({ email: req.body.email });
+    if (userByEmail && !userByEmail.otp)
       return res.status(400).send({
         message: "error: Invalid data",
         error: { message: "This email is already in use" }
       });
-    if (await userSchema.findOne({ name: req.body.name }))
+
+    const userByName = await userSchema.findOne({ name: req.body.name });
+    if (userByName && !userByName.otp)
       return res.status(400).send({
         message: "error: Invalid data",
         error: { message: "This name is already in use" }
       });
 
+    if (userByEmail?.otp || userByName?.otp)
+      await this.deleteNonTrustedUser(userByEmail?.otp ? userByEmail : userByName);
+
     return false;
+  },
+
+  deleteNonTrustedUser: async function (user) {
+    await userSchema.deleteOne({ $or: [{ email: user.email }, { name: user.name }] });
   }
 };
