@@ -32,8 +32,8 @@ export default function SignUp({ innerPath, user, setState, setUser }) {
     axios
       .post(`http://localhost:4000/user/verifyOtp`, { email: user.email, otp: updatedOtp })
       .then((response) => {
-        setUser(response.data.data);
-        setState({ route: "/" });
+        setState({ route: "/login" });
+        alert(response.data.message);
       })
       .catch((error) => {
         console.log(error);
@@ -93,7 +93,7 @@ export default function SignUp({ innerPath, user, setState, setUser }) {
         {innerPath == "/" ? (
           <>
             {/* Signup form */}
-            <Box component="form" noValidate onSubmit={handleSignup} sx={{ mt: 3 }}>
+            <Box component="form" onSubmit={handleSignup} sx={{ mt: 3 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
