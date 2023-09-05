@@ -18,11 +18,15 @@ module.exports = {
 
   checkOtp: async function (email, otp) {
     try {
-      const report = await userSchema.findOneAndUpdate(
+      const userData = await userSchema.findOneAndUpdate(
         { $and: [{ email: email }, { otp: otp }] },
         { $unset: { otp: 1 } }
       );
-      return { message: !report ? "OTP doesn't match" : "verification success", report: report };
+      userData.otp = undefined;
+      return {
+        message: !userData ? "OTP doesn't match" : "verification success",
+        data: userData
+      };
     } catch (error) {
       return { error: error, TimeStamp: Date(), message: "error: otpManager.checkOtp" };
     }

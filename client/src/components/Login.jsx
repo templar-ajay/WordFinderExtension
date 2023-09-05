@@ -12,6 +12,9 @@ export default function Login({ setState, setUser }) {
   const handleLogin = (event) => {
     event.preventDefault();
     const [email, password] = [...new FormData(event.currentTarget).values()];
+    setState((state) => {
+      return { ...state, loading: true };
+    });
 
     axios
       .post(`http://localhost:4000/user/login`, { email, name: email, password })
@@ -20,9 +23,12 @@ export default function Login({ setState, setUser }) {
         setState({ route: "/" });
       })
       .catch((error) => {
-        console.log(error);
-        const response = error.response;
-        alert([404, 401].includes(response.status) ? response.data.message : response.statusText);
+        if (error.response) {
+          const { status, statusText, data } = error.response;
+          setState({ route: "/login" });
+          return alert([404, 401].includes(status) ? data.message : statusText);
+        }
+        setState({ route: "/error", error: error });
       });
   };
   const gotoSignup = (event) => {

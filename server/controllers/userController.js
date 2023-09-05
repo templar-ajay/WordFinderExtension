@@ -68,10 +68,16 @@ class UserController {
         <h5>We hope you find our service cool.</h5><br/>`
       );
       await user.save();
-      otpManager.otpCleaner(125000, user);
-      res.send({ data: user, message: "Please verify email using otp sent to your mail address" });
+      otpManager.otpCleaner(120500, user); // cleanUp in 2min & 500 milliseconds
+      process.env.DEV && console.log(user.otp);
+      res.send({
+        data: { ...user._doc, otp: undefined },
+        message: "Please verify email using otp sent to your mail address"
+      });
     } catch (error) {
-      res.send({ error: error, TimeStamp: Date(), message: "error: UserController.createUser" });
+      res
+        .status(error.message.includes("validation") ? 403 : 500)
+        .send({ error, TimeStamp: Date(), message: "error: UserController.createUser" });
     }
   }
 
@@ -84,12 +90,13 @@ class UserController {
           error: { message: "Otp & email are required." }
         });
 
-      const report = await otpManager.checkOtp(email, otp);
-      res.send(
-        !report && report.message.includes("success")
-          ? { data: report, message: "email verification success" }
-          : report
-      );
+      const data = await otpManager.checkOtp(email, otp);
+      if (data.error) throw data;
+      const otpMatched = data.message.includes("success");
+      res.status(otpMatched ? 200 : 401).send({
+        data: data.data,
+        message: otpMatched ? "Email verification success" : "OTP doesn't match"
+      });
     } catch (error) {
       res.send({ error: error, TimeStamp: Date(), message: "error: UserController.createUser" });
     }

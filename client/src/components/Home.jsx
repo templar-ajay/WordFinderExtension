@@ -45,7 +45,7 @@ export default function Home({ user, setState, setUser }) {
       console.log("retrieved keywords from app.jsx", keywords);
       setKeywords(keywords);
     });
-    !user && setState({ route: "/login", loading: false });
+    !user && setState({ route: "/login" });
   }, []);
   // save and sync keywords in local storage
   useEffect(() => {
@@ -154,6 +154,10 @@ export default function Home({ user, setState, setUser }) {
   }
 
   function handleLogout() {
+    setState((state) => {
+      return { ...state, loading: true };
+    });
+
     axios
       .get(`http://localhost:4000/user/logout`)
       .then((response) => {
@@ -163,6 +167,9 @@ export default function Home({ user, setState, setUser }) {
       .catch((error) => {
         console.log(error.response);
         alert("Internal server error");
+        setState((state) => {
+          return { ...state, loading: false };
+        });
       });
   }
 

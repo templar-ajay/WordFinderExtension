@@ -17,6 +17,8 @@
     "@mui/material": "^5.13.3",
     "@mui/styled-engine-sc": "^5.12.0",
     "axios": "^1.4.0",
+    "mui-one-time-password-input": "^2.0.0",
+    "otp-timer": "^1.1.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.9.0",

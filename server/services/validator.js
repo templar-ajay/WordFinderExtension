@@ -5,7 +5,7 @@ module.exports = {
     if (
       !RegExp("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})").test(req.body.password)
     ) {
-      res.send({
+      res.status(403).send({
         message: "Validation Error",
         error: {
           message:
@@ -18,12 +18,12 @@ module.exports = {
 
   checkUserExisted: async function (req, res) {
     if (await userSchema.findOne({ email: req.body.email }))
-      return res.send({
+      return res.status(400).send({
         message: "error: Invalid data",
         error: { message: "This email is already in use" }
       });
     if (await userSchema.findOne({ name: req.body.name }))
-      return res.send({
+      return res.status(400).send({
         message: "error: Invalid data",
         error: { message: "This name is already in use" }
       });
