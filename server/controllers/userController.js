@@ -77,9 +77,17 @@ class UserController {
         message: "Please verify email using otp sent to your mail address"
       });
     } catch (error) {
-      res
-        .status(error.message.includes("validation") ? 403 : 500)
-        .send({ error, TimeStamp: Date(), message: "error: UserController.createUser" });
+      const mailError = error.code === "EENVELOPE";
+      res.status(error.message.includes("validation") || mailError ? 403 : 500).send({
+        error: mailError
+          ? {
+              ...error,
+              message: "Unable to sent mail on given email, please check your email again"
+            }
+          : error,
+        TimeStamp: Date(),
+        message: "error: UserController.createUser"
+      });
     }
   }
 

@@ -21,8 +21,9 @@ export default function SignUp({ innerPath, user, setState, setUser }) {
     if (newValue.length !== 6) return;
     verifyOtp(newValue);
   };
-  const resendOtp = (resendEvent) => {
-    console.log("resend otp clicked", resendEvent);
+  const resendOtp = () => {
+    setUser(null);
+    setState({ route: "/signup" });
   };
   const verifyOtp = (updatedOtp) => {
     setState((state) => {
@@ -150,12 +151,14 @@ export default function SignUp({ innerPath, user, setState, setUser }) {
                 inputMode="numeric"
                 value={otp}
                 onChange={otpChange}
+                marginBottom={3}
+                marginTop={3}
               />
               <OtpTimer
                 minutes={1}
                 seconds={59}
                 text="Time:"
-                ButtonText="Resend"
+                ButtonText="Go to signup"
                 resend={resendOtp}
               />
             </Box>
