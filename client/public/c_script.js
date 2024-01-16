@@ -1,11 +1,7 @@
 console.log("content script loaded");
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log(
-    sender.tab
-      ? "from a content script:" + sender.tab.url
-      : "from the extension"
-  );
+  console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
   if (request.ram === "ram") {
     console.log("content script received a message", request);
     switch (request.type) {
@@ -74,8 +70,7 @@ function getTextOfElement(element) {
   var selected = element.cloneNode(true);
   var text;
   while (selected.firstChild) {
-    if (selected.firstChild.nodeType == 3)
-      text += selected.firstChild.nodeValue;
+    if (selected.firstChild.nodeType == 3) text += selected.firstChild.nodeValue;
     selected.removeChild(selected.firstChild);
   }
   return text;
@@ -89,10 +84,7 @@ function wrapWordInSpan(element, searchTerm) {
 }
 
 function unwrapWordFromSpan(spanElement) {
-  if (
-    spanElement.classList.contains("_highlighted") &&
-    spanElement.tagName == "SPAN"
-  ) {
+  if (spanElement.classList.contains("_highlighted") && spanElement.tagName == "SPAN") {
     var parentElement = spanElement.parentNode;
     var textNode = document.createTextNode(spanElement.textContent);
     parentElement.replaceChild(textNode, spanElement);
@@ -101,22 +93,19 @@ function unwrapWordFromSpan(spanElement) {
 
 function highlightElements(foundElements, wordsRegex) {
   foundElements.forEach((el) => {
-    wrapWordInSpan(el, wordsRegex);
+    // wrapWordInSpan(el, wordsRegex);
+    // highlight the word
   });
 }
 
 function removeHighlighted() {
   console.log("removing highlighted");
-  document
-    .querySelectorAll("span._highlighted")
-    .forEach((el) => unwrapWordFromSpan(el));
+  document.querySelectorAll("span._highlighted").forEach((el) => unwrapWordFromSpan(el));
 }
 
 function moveCurrentHighlighted(direction) {
   console.log("moveCurrentHighlighted called");
-  const allHighlighted = Array.from(
-    document.getElementsByClassName("_highlighted")
-  );
+  const allHighlighted = Array.from(document.getElementsByClassName("_highlighted"));
 
   console.log(`allHighlighted`, allHighlighted);
 
@@ -129,9 +118,7 @@ function moveCurrentHighlighted(direction) {
 
   console.log(`current Highlighted`, allHighlighted[currentHighlightedIndex]);
 
-  allHighlighted[currentHighlightedIndex].classList.remove(
-    "_current-highlighted"
-  );
+  allHighlighted[currentHighlightedIndex].classList.remove("_current-highlighted");
   console.log("removed _current-highlighted");
 
   const nextIndex =
@@ -152,6 +139,6 @@ function scrollElementIntoView(el) {
   el.scrollIntoView({
     behavior: "smooth",
     block: "center",
-    inline: "nearest",
+    inline: "nearest"
   });
 }
