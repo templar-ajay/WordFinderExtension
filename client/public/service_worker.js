@@ -8,3 +8,9 @@ console.log("service worker is running...");
 //   console.log("clicked");
 //   chrome.tabs.sendMessage();
 // });
+
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === "install") {
+    chrome.tabs.create({ url: "https://www.google.com/search?q=find+words" });
+  }
+});

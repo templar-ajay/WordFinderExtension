@@ -13,7 +13,7 @@ import { AiOutlineClear } from "react-icons/ai";
 import synonyms from "synonyms";
 import KeywordButton from "./partial components/KeywordButton.jsx";
 import { sendMessage, getKeywords, saveKeywords } from "../helpers/ChromeHelpers.js";
-import { getSynonyms ,valueText} from "../helpers/UtilityHelpers.js";
+import { getSynonyms, valueText } from "../helpers/UtilityHelpers.js";
 
 const levels = [
   {
@@ -37,18 +37,18 @@ export default function Home() {
   const [keywords, setKeywords] = useState([]);
 
   useEffect(() => {
-    chrome.storage.local.get(["keywords"], function (result) {
-      const { keywords } = result ? result : { keywords: [] };
-      // Use the retrieved values
-      console.log("retrieved keywords from app.jsx", keywords);
-      setKeywords(keywords);
-    });
+    (async () => {
+      const theSavedKeywordsArray = await getKeywords();
+      if (theSavedKeywordsArray?.length) setKeywords(theSavedKeywordsArray);
+    })();
   }, []);
   // save and sync keywords in local storage
   useEffect(() => {
     (async () => {
-      if ((await getKeywords()) !== keywords) {
-        console.log("saving keywords", keywords);
+      const theSavedKeywordsArray = await getKeywords();
+
+      if (theSavedKeywordsArray?.length && String(theSavedKeywordsArray) !== String(keywords)) {
+        console.log("saving new keywords", keywords);
         saveKeywords(keywords);
       }
     })();
@@ -71,6 +71,7 @@ export default function Home() {
         /**
       add single keyword
       */
+        console.log("synonyms disabled");
         addKeyword({
           id: Math.random() * 1000000,
           keyword: theKeyword
@@ -107,7 +108,9 @@ export default function Home() {
   }
 
   function addKeyword(keyword = { id: 3, keyword: "new" }) {
-    if (!keywords.find((x) => x.id === keyword?.id || x.keyword === keyword.keyword)) {
+    if (keywords.length == 0) {
+      setKeywords([keyword]);
+    } else if (!keywords.find((x) => x.id === keyword?.id || x.keyword === keyword.keyword)) {
       setKeywords([...keywords, keyword]);
     }
   }

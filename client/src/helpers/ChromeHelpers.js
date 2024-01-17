@@ -1,5 +1,5 @@
 export function sendMessage(type, data) {
-  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(
       tabs[0].id,
       {
@@ -15,8 +15,9 @@ export function sendMessage(type, data) {
 }
 
 export async function getKeywords() {
-  const { keywords } = await chrome.storage.local.get(["keywords"]);
-  return keywords ? keywords : [];
+  const result = await chrome.storage.local.get(["keywords"]);
+  const keywords = result.keywords || [];
+  return keywords;
 }
 
 export async function saveKeywords(keywords) {
