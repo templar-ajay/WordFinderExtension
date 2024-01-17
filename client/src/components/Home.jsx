@@ -34,25 +34,12 @@ export default function Home() {
   const [synonymsEnabled, setSynonymsEnabled] = useState(false);
   const [synonymsLevel, setSynonymsLevel] = useState(0);
   const [text, setText] = useState("");
-  const [keywords, setKeywords] = useState([]);
+  const [keywords, _setKeywords] = useState([]);
 
-  useEffect(() => {
-    (async () => {
-      const theSavedKeywordsArray = await getKeywords();
-      if (theSavedKeywordsArray?.length) setKeywords(theSavedKeywordsArray);
-    })();
-  }, []);
-  // save and sync keywords in local storage
-  useEffect(() => {
-    (async () => {
-      const theSavedKeywordsArray = await getKeywords();
-
-      if (theSavedKeywordsArray?.length && String(theSavedKeywordsArray) !== String(keywords)) {
-        console.log("saving new keywords", keywords);
-        saveKeywords(keywords);
-      }
-    })();
-  }, [keywords]);
+  function setKeywords(x) {
+    console.log("savingKeywords", x);
+    _setKeywords(x);
+  }
 
   const handleChange = (event) => setSynonymsEnabled(event.target.checked);
 

@@ -8,7 +8,7 @@ export function sendMessage(type, data) {
         data: data
       },
       function (response) {
-        if (response) console.log(response);
+        if (response) console.log("response for type", type, response);
       }
     );
   });
