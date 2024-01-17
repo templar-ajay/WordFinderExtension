@@ -93,8 +93,7 @@ function unwrapWordFromSpan(spanElement) {
 
 function highlightElements(foundElements, wordsRegex) {
   foundElements.forEach((el) => {
-    // wrapWordInSpan(el, wordsRegex);
-    // highlight the word
+    wrapWordInSpan(el, wordsRegex);
   });
 }
 
